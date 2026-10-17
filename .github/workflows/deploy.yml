@@ -1,0 +1,22 @@
+name: Publicar na Netlify
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Montar pasta publica
+        run: mkdir _site && cp -r index.html robots.txt img _site/
+      - name: Deploy
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: 91e944e8-3373-4d17-9433-db17f1af3d59
+        run: npx --yes netlify-cli@17 deploy --prod --dir=_site--no-build --message "${{ github.sha }}"
